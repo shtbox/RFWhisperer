@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <OutputType>Library</OutputType>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>SDRSharp.RFWhisperer</AssemblyName>
+    <RootNamespace>SDRSharp.RFWhisperer</RootNamespace>
+    <Platforms>AnyCPU</Platforms>
+    <LangVersion>latest</LangVersion>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Path to the SDR# plugin SDK lib folder -->
+    <SdrSharpSdk>C:\Users\dan\Downloads\sdrsharp-plugin-sdk-vs2022-dotnet9\sdrplugins\lib</SdrSharpSdk>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Real SDR# DLLs — Private=false: SDR# provides these at runtime, don't copy to output -->
+    <Reference Include="SDRSharp.Common">
+      <HintPath>$(SdrSharpSdk)\SDRSharp.Common.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="SDRSharp.Radio">
+      <HintPath>$(SdrSharpSdk)\SDRSharp.Radio.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <!-- Exclude stubs now that we have the real DLLs -->
+    <Compile Remove="Stubs\**" />
+  </ItemGroup>
+
+</Project>

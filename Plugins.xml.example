@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  SDR# Plugin Registration
+  ========================
+  Copy this entry into the <sharpPlugins> section of your SDRSharp.exe.config
+  (located in your SDR# installation folder).
+
+  For modern SDR# versions that support auto-discovery, simply copy
+  SDRSharp.RFWhisperer.dll into the SDR# Plugins\ folder.
+-->
+<sharpPlugins>
+  <add key="RF Whisperer" value="SDRSharp.RFWhisperer.RFWhispererPlugin,SDRSharp.RFWhisperer" />
+</sharpPlugins>
