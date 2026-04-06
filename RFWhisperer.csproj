@@ -18,9 +18,11 @@
   <PropertyGroup>
     <!-- Path to the SDR# plugin SDK lib folder -->
     <SdrSharpSdk>C:\Users\dan\Downloads\sdrsharp-plugin-sdk-vs2022-dotnet9\sdrplugins\lib</SdrSharpSdk>
+    <UseSdrSharpStubs Condition="'$(UseSdrSharpStubs)' == '' and !Exists('$(SdrSharpSdk)\SDRSharp.Common.dll')">true</UseSdrSharpStubs>
+    <UseSdrSharpStubs Condition="'$(UseSdrSharpStubs)' == ''">false</UseSdrSharpStubs>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(UseSdrSharpStubs)' != 'true'">
     <!-- Real SDR# DLLs — Private=false: SDR# provides these at runtime, don't copy to output -->
     <Reference Include="SDRSharp.Common">
       <HintPath>$(SdrSharpSdk)\SDRSharp.Common.dll</HintPath>
@@ -30,7 +32,10 @@
       <HintPath>$(SdrSharpSdk)\SDRSharp.Radio.dll</HintPath>
       <Private>false</Private>
     </Reference>
-    <!-- Exclude stubs now that we have the real DLLs -->
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseSdrSharpStubs)' != 'true'">
+    <!-- Exclude stubs when the real SDK assemblies are available -->
     <Compile Remove="Stubs\**" />
   </ItemGroup>
 

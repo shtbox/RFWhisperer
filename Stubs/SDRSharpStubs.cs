@@ -100,6 +100,11 @@ namespace SDRSharp.Common
 
         // --- State ---
         bool IsPlaying { get; }
+        int RFDisplayBandwidth { get; }
+        float VisualSNR { get; }
+        float VisualPeak { get; }
+        float VisualFloor { get; }
+        void GetSpectrumSnapshot(float[] buffer, float minPower, float maxPower);
 
         // --- Control ---
         void StartRadio();
@@ -117,8 +122,6 @@ namespace SDRSharp.Common
     public interface ISharpPlugin
     {
         string DisplayName { get; }
-        bool HasGui { get; }
-        UserControl GuiControl { get; }
         void Initialize(ISharpControl control);
         void Close();
     }
@@ -133,5 +136,40 @@ namespace SDRSharp.Common
 
         public float Magnitude => MathF.Sqrt(Real * Real + Imaginary * Imaginary);
         public float MagnitudeSquared => Real * Real + Imaginary * Imaginary;
+
+        public float Modulus() => Magnitude;
+        public float ModulusSquared() => MagnitudeSquared;
+    }
+}
+
+namespace SDRSharp.Radio
+{
+    public unsafe interface IIQProcessor
+    {
+        bool Enabled { get; set; }
+        double SampleRate { set; }
+        void Process(Complex* buffer, int length);
+    }
+
+    public interface ICanLazyLoadGui
+    {
+        bool IsActive { get; }
+        UserControl Gui { get; }
+        void LoadGui();
+    }
+
+    public interface IExtendedNameProvider
+    {
+        string Category { get; }
+        string MenuItemName { get; }
+    }
+
+    public struct Complex
+    {
+        public float Real;
+        public float Imag;
+
+        public float Modulus() => MathF.Sqrt(Real * Real + Imag * Imag);
+        public float ModulusSquared() => Real * Real + Imag * Imag;
     }
 }

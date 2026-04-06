@@ -643,7 +643,7 @@ namespace SDRSharp.RFWhisperer.UI
                 _context.TuneFrequency = _sdr.Frequency;
                 _context.FilterBandwidth = _sdr.FilterBandwidth;
                 _context.DetectorType = _sdr.DetectorType.ToString();
-                _context.AudioGain = _sdr.AudioGain;
+                _context.AudioGain = (int)Math.Round((double)_sdr.AudioGain);
                 _context.UseAgc = _sdr.UseAgc;
                 _context.IsPlaying = _sdr.IsPlaying;
                 _context.SquelchEnabled = _sdr.SquelchEnabled;

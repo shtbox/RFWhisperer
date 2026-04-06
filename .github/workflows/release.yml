@@ -1,0 +1,93 @@
+name: Build And Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Release tag to publish, for example v1.0.0"
+        required: true
+      release_name:
+        description: "Optional release title"
+        required: false
+      prerelease:
+        description: "Mark the GitHub Release as a prerelease"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Resolve release metadata
+        id: meta
+        shell: pwsh
+        run: |
+          $tag = if ("${{ github.event_name }}" -eq "workflow_dispatch") { "${{ github.event.inputs.tag_name }}" } else { "${{ github.ref_name }}" }
+          $name = if ("${{ github.event.inputs.release_name }}") { "${{ github.event.inputs.release_name }}" } else { "RFWhisperer $tag" }
+          "tag=$tag" >> $env:GITHUB_OUTPUT
+          "name=$name" >> $env:GITHUB_OUTPUT
+          "zip=RFWhisperer-$tag.zip" >> $env:GITHUB_OUTPUT
+
+      - name: Create tag for manual release
+        if: github.event_name == 'workflow_dispatch'
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rev-parse "refs/tags/${{ steps.meta.outputs.tag }}" 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            git tag "${{ steps.meta.outputs.tag }}"
+            git push origin "refs/tags/${{ steps.meta.outputs.tag }}"
+          }
+
+      - name: Restore
+        run: dotnet restore RFWhisperer.csproj -p:UseSdrSharpStubs=true
+
+      - name: Build
+        run: dotnet build RFWhisperer.csproj -c Release --no-restore -p:UseSdrSharpStubs=true
+
+      - name: Stage release files
+        shell: pwsh
+        run: |
+          $stage = Join-Path $env:RUNNER_TEMP "rfwhisperer-release"
+          New-Item -ItemType Directory -Force -Path $stage | Out-Null
+          Copy-Item "bin\Release\net9.0-windows\SDRSharp.RFWhisperer.dll" $stage
+          if (Test-Path "bin\Release\net9.0-windows\SDRSharp.RFWhisperer.pdb") {
+            Copy-Item "bin\Release\net9.0-windows\SDRSharp.RFWhisperer.pdb" $stage
+          }
+          Copy-Item "Plugins.xml.example" $stage
+          Copy-Item "README.md" $stage
+          Compress-Archive -Path (Join-Path $stage "*") -DestinationPath "${{ steps.meta.outputs.zip }}" -Force
+
+      - name: Upload release package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RFWhisperer-${{ steps.meta.outputs.tag }}
+          path: ${{ steps.meta.outputs.zip }}
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: ${{ steps.meta.outputs.name }}
+          prerelease: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.prerelease || false }}
+          generate_release_notes: true
+          files: ${{ steps.meta.outputs.zip }}
