@@ -13,6 +13,8 @@
     <Platforms>AnyCPU</Platforms>
     <LangVersion>latest</LangVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Copyright (c) 2025 Dan Martinelli</Copyright>
   </PropertyGroup>
 
   <PropertyGroup>

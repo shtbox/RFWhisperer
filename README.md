@@ -1,5 +1,7 @@
 # SDR# RF Whisperer Plugin
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 An AI-powered plugin for [SDR#](https://airspy.com/download/) that gives you a conversational radio assistant directly inside the app. Whether you're just getting started with software defined radio or you're an experienced operator, the assistant can identify signals, tune to frequencies, diagnose reception problems, and configure SDR# — all through natural language.
 
 **Runs fully offline.** You can use local LLMs running on your own machine — no internet connection, no API key, no data leaving your computer. Tools like [Ollama](https://ollama.com), LM Studio, and llama.cpp are supported out of the box. Cloud providers (Anthropic, OpenAI, Groq, OpenRouter) are also supported if you prefer them.
@@ -232,3 +234,9 @@ dotnet build RFWhisperer.csproj /p:SdrSharpSdk="path\to\sdk\lib"
 The `SdrSharpSdk` property defaults to the path set in the `.csproj` file. The built DLL does not include the SDR# assemblies (`Private=false`) — they are provided by the host at runtime.
 
 Settings are stored as JSON at `<plugin folder>\SDRSharp.RFWhisperer.json`. The API key is stored locally and is only ever transmitted to the configured API endpoint.
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE) for details.
